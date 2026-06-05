@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 Happy Birthday!</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --pink: #FFB3C6;
+    --pink-deep: #FF85A1;
+    --yellow: #FFF0A0;
+    --yellow-warm: #FFE066;
+    --peach: #FFD6B0;
+    --white: #FFFEF7;
+    --text: #7A4F6D;
+    --text-light: #C2849B;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--pink) 50%, var(--peach) 100%);
+    font-family: 'Quicksand', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .floaties {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .floaty {
+    position: absolute;
+    font-size: 1.8rem;
+    opacity: 0.4;
+    animation: floatUp linear infinite;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(110vh) rotate(0deg);
+      opacity: 0;
+    }
+
+    10% {
+      opacity: 0.4;
+    }
+
+    90% {
+      opacity: 0.4;
+    }
+
+    100% {
+      transform: translateY(-10vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  /* ================= LOCK SCREEN ================= */
+  #lock-screen {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(18px);
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 32px;
+    padding: 52px 44px;
+    max-width: 430px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(255,133,161,0.25), 0 4px 20px rgba(255,182,198,0.3);
+  }
+
+  .lock-icon {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 8px;
+    animation: wiggle 2s ease-in-out infinite;
+  }
+
+  @keyframes wiggle {
+    0%,100% {
+      transform: rotate(-5deg);
+    }
+
+    50% {
+      transform: rotate(5deg);
+    }
+  }
+
+  .lock-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .lock-sub {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+  }
+
+  .pin-display {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .pin-dot {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: rgba(255,179,198,0.25);
+    border: 2px solid rgba(255,133,161,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    transition: all 0.2s;
+  }
+
+  .pin-dot.filled {
+    background: var(--pink-deep);
+    border-color: var(--pink-deep);
+    box-shadow: 0 4px 14px rgba(255,133,161,0.5);
+    transform: scale(1.05);
+    color: white;
+  }
+
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .key {
+    height: 64px;
+    border-radius: 18px;
+    border: none;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+    background: rgba(255,255,255,0.72);
+    border: 2px solid rgba(255,179,198,0.4);
+  }
+
+  .key:hover {
+    background: var(--yellow);
+    border-color: var(--yellow-warm);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255,224,102,0.4);
+  }
+
+  .key:active {
+    transform: scale(0.94);
+  }
+
+  .key.del {
+    background: rgba(255,133,161,0.15);
+    font-size: 1.2rem;
+  }
+
+  .key.del:hover {
+    background: rgba(255,133,161,0.3);
+    border-color: var(--pink-deep);
+  }
+
+  .error-msg {
+    color: var(--pink-deep);
+    font-size: 0.9rem;
+    margin-top: 14px;
+    min-height: 20px;
+  }
+
+  @keyframes shake {
+    0%,100% {
+      transform: translateX(0);
+    }
+
+    25% {
+      transform: translateX(-8px);
+    }
+
+    75% {
+      transform: translateX(8px);
+    }
+  }
+
+  /* ================= BIRTHDAY SCREEN ================= */
+  #birthday-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    overflow-y: auto;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px 60px;
+  }
+
+  #birthday-screen.show {
+    display: flex;
+    animation: fadeInScale 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .birthday-card {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255,255,255,0.9);
+    border-radius: 40px;
+    padding: 52px 44px;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(255,133,161,0.2), 0 8px 30px rgba(255,179,198,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .birthday-card::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,224,102,0.3), transparent 70%);
+  }
+
+  .birthday-card::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,133,161,0.2), transparent 70%);
+  }
+
+  .cake-emoji {
+    font-size: 5rem;
+    display: block;
+    animation: bounceIn 1s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+    margin-bottom: 16px;
+  }
+
+  @keyframes bounceIn {
+    from {
+      transform: scale(0) rotate(-20deg);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .bday-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 8px;
+    animation: slideUp 0.7s ease 0.5s both;
+  }
+
+  .bday-heading em {
+    color: var(--pink-deep);
+    font-style: italic;
+  }
+
+  .bday-sub {
+    font-size: 1.15rem;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    animation: slideUp 0.7s ease 0.6s both;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .photo-zone {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 24px;
+    animation: slideUp 0.7s ease 0.65s both;
+  }
+
+  .main-photo {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    display: block;
+    border-radius: 24px;
+    border: 2.5px solid rgba(255,133,161,0.45);
+    box-shadow: 0 10px 26px rgba(255,133,161,0.22);
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 24px 0;
+    animation: slideUp 0.7s ease 0.7s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1.5px;
+  }
+
+  .divider::before {
+    background: linear-gradient(to right, transparent, var(--pink));
+  }
+
+  .divider::after {
+    background: linear-gradient(to left, transparent, var(--pink));
+  }
+
+  .message-box {
+    background: linear-gradient(135deg, rgba(255,240,160,0.4), rgba(255,179,198,0.3));
+    border: 1.5px solid rgba(255,133,161,0.3);
+    border-radius: 24px;
+    padding: 28px 24px;
+    margin: 0 0 24px;
+    animation: slideUp 0.7s ease 0.8s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .message-text {
+    font-size: 1rem;
+    line-height: 1.95;
+    color: var(--text);
+    white-space: pre-line;
+    text-align: left;
+  }
+
+  .wishes-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 0 24px;
+    animation: slideUp 0.7s ease 0.9s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .wish-tag {
+    background: linear-gradient(135deg, var(--yellow), var(--peach));
+    border: 1.5px solid rgba(255,224,102,0.6);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 3px 10px rgba(255,224,102,0.3);
+  }
+
+  .confetti-btn {
+    background: linear-gradient(135deg, var(--pink-deep), #FF6B9D);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 36px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255,107,157,0.4);
+    transition: all 0.2s;
+    animation: slideUp 0.7s ease 1s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .confetti-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255,107,157,0.5);
+  }
+
+  .confetti-btn:active {
+    transform: scale(0.96);
+  }
+
+  /* ================= PARTY SCREEN ================= */
+  #celebration-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    overflow-y: auto;
+    padding: 40px 20px 60px;
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--pink) 50%, var(--peach) 100%);
+  }
+
+  #celebration-screen.show {
+    display: block;
+    animation: fadeInScale 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  .celeb-inner {
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .celeb-card {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255,255,255,0.9);
+    border-radius: 40px;
+    padding: 44px 36px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(255,133,161,0.2);
+    margin-bottom: 20px;
+  }
+
+  .celeb-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .celeb-title em {
+    color: var(--pink-deep);
+    font-style: italic;
+  }
+
+  .celeb-sub {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+
+  .photos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .photo-slot {
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    border: 2.5px solid rgba(255,133,161,0.4);
+    background: linear-gradient(135deg, rgba(255,240,160,0.3), rgba(255,179,198,0.2));
+    position: relative;
+    box-shadow: 0 8px 18px rgba(255,133,161,0.15);
+  }
+
+  .photo-slot img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .links-section {
+    margin-bottom: 20px;
+  }
+
+  .links-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .links-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .link-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, rgba(255,240,160,0.5), rgba(255,179,198,0.3));
+    border: 1.5px solid rgba(255,133,161,0.25);
+    border-radius: 50px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .link-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255,133,161,0.25);
+  }
+
+  .back-btn {
+    background: rgba(255,255,255,0.6);
+    border: 1.5px solid rgba(255,133,161,0.3);
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .back-btn:hover {
+    background: rgba(255,255,255,0.85);
+  }
+
+  /* ================= CONFETTI FROM TOP ================= */
+  .confetti-piece {
+    position: fixed;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 999;
+    animation: confettiFall 2.5s ease-out forwards;
+  }
+
+  @keyframes confettiFall {
+    0% {
+      transform: translateY(-150px) rotate(0deg);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(calc(100vh + 150px)) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #lock-screen {
+      padding: 44px 28px;
+    }
+
+    .birthday-card,
+    .celeb-card {
+      padding: 40px 26px;
+      border-radius: 32px;
+    }
+
+    .pin-dot {
+      width: 52px;
+      height: 52px;
+    }
+
+    .key {
+      height: 58px;
+    }
+
+    .bday-heading {
+      font-size: 2.35rem;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="floaties" id="floaties"></div>
+
+<!-- ================= หน้าใส่รหัส เริ่มต้นแสดงเฉพาะหน้านี้ ================= -->
+<div id="lock-screen">
+  <span class="lock-icon">🎀</span>
+  <h2 class="lock-title">มีของขวัญรออยู่~</h2>
+  <p class="lock-sub">ใส่รหัสเพื่อเปิดกล่องของขวัญ ✨</p>
+
+  <div class="pin-display">
+    <div class="pin-dot" id="dot-0"></div>
+    <div class="pin-dot" id="dot-1"></div>
+    <div class="pin-dot" id="dot-2"></div>
+    <div class="pin-dot" id="dot-3"></div>
+  </div>
+
+  <div class="keypad">
+    <button class="key" onclick="pressKey('1')">1</button>
+    <button class="key" onclick="pressKey('2')">2</button>
+    <button class="key" onclick="pressKey('3')">3</button>
+    <button class="key" onclick="pressKey('4')">4</button>
+    <button class="key" onclick="pressKey('5')">5</button>
+    <button class="key" onclick="pressKey('6')">6</button>
+    <button class="key" onclick="pressKey('7')">7</button>
+    <button class="key" onclick="pressKey('8')">8</button>
+    <button class="key" onclick="pressKey('9')">9</button>
+    <button class="key" style="visibility:hidden"></button>
+    <button class="key" onclick="pressKey('0')">0</button>
+    <button class="key del" onclick="deleteKey()">⌫</button>
+  </div>
+
+  <p class="error-msg" id="error-msg"></p>
+</div>
+
+<!-- ================= หน้าวันเกิด แสดงหลังใส่รหัสถูก ================= -->
+<div id="birthday-screen">
+  <div class="birthday-card">
+    <span class="cake-emoji">🎂</span>
+
+    <h1 class="bday-heading">Happy<br><em>Birthday!</em></h1>
+    <p class="bday-sub">🌸 วันเกิดสุขสันต์นะคะ 🌸</p>
+
+    <!-- เปลี่ยนรูปหลักตรง src ได้เลย -->
+    <div class="photo-zone">
+      <img
+        class="main-photo"
+        src="2.png"
+        alt="รูปวันเกิด">
+    </div>
+
+    <div class="divider">🎀</div>
+
+    <div class="message-box">
+      <p class="message-text">📣ฮัลโหล ฮัลโหลๆๆๆ เทสๆ มาแล้วค้าบบบบ✨
+มาง้อแล้ววว ดีกันนะๆๆ แน่นอนว่าไม่ลืมหรอแต่อาจจะช้า(ช้านิสนุง)
+ขอให้มีความสุขมากๆๆๆๆๆ สุขภาพแข็งแรง เฮงๆรวยๆ อยู่ด้วยกันไปนานๆ ถึงแม้จะไม่ได้คุยเลย(กุดองแชทเองแหละ หนูขอโทษ🙏)</p>
+    </div>
+
+    <div class="wishes-row">
+      <span class="wish-tag">🌟 สุขภาพดี</span>
+      <span class="wish-tag">💛 ความสุข</span>
+      <span class="wish-tag">🎉 เฮงๆรวยๆ</span>
+      <span class="wish-tag">💕 อยู่ด้วยกันนานๆ</span>
+    </div>
+
+    <button class="confetti-btn" onclick="goToCelebration()">🎊 เฉลิมฉลองกันเลย!</button>
+  </div>
+</div>
+
+<!-- ================= หน้า Party แสดงเฉพาะหลังกดปุ่มเท่านั้น ================= -->
+<div id="celebration-screen">
+  <div class="celeb-inner">
+    <div class="celeb-card">
+      <div style="font-size:3rem;margin-bottom:12px">🎉✨🎊</div>
+      <h2 class="celeb-title"><em>Party Time!</em></h2>
+      <p class="celeb-sub">💛</p>
+
+      <!-- เปลี่ยนรูป 4 รูปตรง src ได้เลย -->
+      <div >
+        <div class="photo-slot">
+        <img src="1.png" alt="รูปที่ 1">
+        </div>
+
+
+      </div>
+
+      <!-- เหลือ 1 ลิงก์ เปลี่ยน href ได้เลย -->
+      <div class="links-section">
+
+        <div class="links-display">
+          <a class="link-pill" href="https://gift.truemoney.com/campaign/?v=019e98600831772cadf28a216e1bc291d9t" target="_blank" rel="noopener">
+            <span>🎁</span>
+            <span>ของขวัญพิเศษ</span>
+          </a>
+        </div>
+      </div>
+
+      <button class="back-btn" onclick="goBack()">← กลับหน้าวันเกิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* เปลี่ยนรหัสตรงนี้ */
+  const CORRECT = '0506';
+
+  let entered = '';
+
+  /* พื้นหลังอีโมจิลอย */
+  const emojis = ['🌸','🌷','💛','🎀','✨','🌟','🍭','🎈','💕','🌺','🎂','🍰'];
+  const floaties = document.getElementById('floaties');
+
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'floaty';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.animationDuration = (8 + Math.random() * 12) + 's';
+    el.style.animationDelay = (Math.random() * 12) + 's';
+    el.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
+    floaties.appendChild(el);
+  }
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('dot-' + i);
+      dot.classList.toggle('filled', i < entered.length);
+      dot.textContent = i < entered.length ? '●' : '';
+    }
+  }
+
+  function pressKey(k) {
+    if (entered.length >= 4) return;
+
+    entered += k;
+    updateDots();
+    document.getElementById('error-msg').textContent = '';
+
+    if (entered.length === 4) {
+      setTimeout(checkCode, 200);
+    }
+  }
+
+  function deleteKey() {
+    entered = entered.slice(0, -1);
+    updateDots();
+    document.getElementById('error-msg').textContent = '';
+  }
+
+  function checkCode() {
+    if (entered === CORRECT) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('birthday-screen').classList.add('show');
+      setTimeout(launchConfetti, 600);
+    } else {
+      const msg = document.getElementById('error-msg');
+      msg.textContent = '❌ รหัสไม่ถูกต้อง ลองใหม่นะคะ~';
+      msg.style.animation = 'none';
+      void msg.offsetWidth;
+      msg.style.animation = 'shake 0.4s ease';
+
+      entered = '';
+      updateDots();
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key >= '0' && e.key <= '9') {
+      pressKey(e.key);
+    }
+
+    if (e.key === 'Backspace') {
+      deleteKey();
+    }
+  });
+
+  function goToCelebration() {
+    launchConfetti();
+
+    setTimeout(() => {
+      document.getElementById('birthday-screen').style.display = 'none';
+      document.getElementById('celebration-screen').classList.add('show');
+      setTimeout(launchConfetti, 400);
+    }, 300);
+  }
+
+  function goBack() {
+    document.getElementById('celebration-screen').style.display = 'none';
+    document.getElementById('celebration-screen').classList.remove('show');
+    document.getElementById('birthday-screen').style.display = '';
+  }
+
+  function launchConfetti() {
+    const colors = ['#FFB3C6','#FFE066','#FF85A1','#FFD6B0','#E8D5FF','#FFF0A0','#FF6B9D'];
+
+    for (let i = 0; i < 120; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = (-50 - Math.random() * 300) + 'px';
+
+      c.style.width = (6 + Math.random() * 10) + 'px';
+      c.style.height = (6 + Math.random() * 10) + 'px';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+
+      c.style.animationDelay = (Math.random() * 1.2) + 's';
+      c.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+
+      document.body.appendChild(c);
+
+      setTimeout(() => {
+        c.remove();
+      }, 5000);
+    }
+  }
+</script>
+
+</body>
+</html>
